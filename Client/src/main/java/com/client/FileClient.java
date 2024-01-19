@@ -1,3 +1,10 @@
+/**
+ * Reviewing his coding assignment, there were multiple issues, include not
+ * meeting the requirements of the assignment (mainly recreating the file
+ * on the server with the original file name (he created a different filename
+ * on the server), and instead of using the WatchService for monitoring a
+ * directory, he implemented a custom solution for which there were issues with.
+ */
 package com.client;
 
 import java.io.*;
@@ -62,7 +69,7 @@ public class FileClient {
                 System.out.println("Server response: " + objectInputStream.readObject().toString());
 
                 for (String fileNames : processFiles) {
-                    Map<String, String> fileDataMap = convertFileToMap(DIRECTORY_NAME + "/" + fileNames);
+                    Map<String, String> fileDataMap = convertFileToMap(DIRECTORY_NAME + "/" + fileNames, fileNames);
                     objectOutputStream.writeObject(fileDataMap);
                     objectOutputStream.flush();
 
@@ -103,15 +110,16 @@ public class FileClient {
         }
     }
 
-    private static Map<String, String> convertFileToMap(String fileName) {
+    private static Map<String, String> convertFileToMap(String fileNameWthDirectory, String fileName) {
         Properties properties = new Properties();
         Map<String, String> dataMap = new HashMap<>();
         try {
-            FileInputStream fileInputStream = new FileInputStream(fileName);
+            FileInputStream fileInputStream = new FileInputStream(fileNameWthDirectory);
             properties.load(fileInputStream);
 
             Pattern pattern = Pattern.compile(REGULAR_EXPRESSION);
 
+            dataMap.put("client_file_name", fileName);
             for (Map.Entry<Object, Object> entries : properties.entrySet()) {
                 Matcher matcher = pattern.matcher((String) entries.getKey());
                 if (matcher.matches()) {
